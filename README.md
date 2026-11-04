@@ -23,3 +23,4 @@ Upload `Breast_Cancer.csv` in the dashboard sidebar, or put it in this folder or
 
 Sidebar filters update all charts. The tumor-size IQR exclusion is optional and off by default so the initial view retains the full deduplicated cohort. Results describe this dataset and are not individual prognosis or clinical advice.
 # Breast_Cancer_Dashboard
+# Breast_Cancer_Dashboard
