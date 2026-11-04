@@ -107,6 +107,11 @@ def palette_for_status(values: list[str]) -> dict[str, str]:
     return {value: OUTCOME_COLORS.get(value, "#7d8ba3") for value in values}
 
 
+def spearman_correlation(left: pd.Series, right: pd.Series) -> float:
+    pair = pd.concat((pd.Series(left), pd.Series(right)), axis=1).dropna()
+    return pair.iloc[:, 0].rank().corr(pair.iloc[:, 1].rank())
+
+
 def style_figure(fig, height: int | None = None):
     fig.update_layout(
         paper_bgcolor="white",
@@ -363,7 +368,7 @@ with overview_tab:
     if tumor_col is not None and survival_col is not None:
         pair = working[[tumor_col, survival_col]].dropna()
         if len(pair) > 2:
-            correlation = pair[tumor_col].corr(pair[survival_col], method="spearman")
+            correlation = spearman_correlation(pair[tumor_col], pair[survival_col])
             if pd.notna(correlation):
                 insights.append(f"Tumor size and recorded survival months have a Spearman correlation of {correlation:.2f} in this selection; this association does not show cause and effect.")
     if not insights:
@@ -485,7 +490,7 @@ with quality_tab:
 
     numeric_columns = [column for column in df.select_dtypes(include="number").columns if df[column].nunique(dropna=True) > 1]
     if len(numeric_columns) >= 2:
-        correlation = df[numeric_columns].corr(method="spearman")
+        correlation = df[numeric_columns].corr(method=spearman_correlation)
         fig = px.imshow(correlation, text_auto=".2f", color_continuous_scale="RdBu_r", zmin=-1, zmax=1, title="Spearman correlations across numeric fields")
         st.plotly_chart(style_figure(fig, 510), use_container_width=True)
 
